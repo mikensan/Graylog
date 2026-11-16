@@ -1,0 +1,967 @@
+{
+  "v": 1,
+  "id": "5386d0db-28f2-4f45-a1e5-2ea348f3bd41",
+  "rev": 1,
+  "name": "Unifi",
+  "summary": "Support for Network 11",
+  "description": "Pipeline and rules to filter out most of the syslog messages coming from a Unifi site running Network 11 and Unifi OS.",
+  "vendor": "myself",
+  "url": "https://github.com/mikensan/Graylog",
+  "parameters": [],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "2064cecc-2895-4d63-be80-c5fba0702315",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-11-wan-classification"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-11-wan-classification\"\nwhen\n    has_field(\"unifi_chain\") &&\n    contains(to_string($message.unifi_chain), \"_WAN-\")\nthen\n    set_field(\"unifi_event_type\", \"wan_firewall\");\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline",
+        "version": "1"
+      },
+      "id": "47d56d0f-06fc-4473-acf6-e672d8190920",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "UniFi Network 11"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "pipeline \"UniFi Network 11\"\nstage 0 match either\nrule \"unifi-01-firewall\"\nrule \"unifi-02-process\"\nrule \"unifi-03-cef\"\nstage 1 match either\nrule \"unifi-11-custom-classification\"\nrule \"unifi-11-dnat-classification\"\nrule \"unifi-11-wan-classification\"\nrule \"unifi-04-dhcp\"\nrule \"unifi-05-dhcp-ip\"\nrule \"unifi-06-diagnostics\"\nrule \"unifi-07-destination-interface\"\nrule \"unifi-08a-tcp-sequence\"\nrule \"unifi-08b-tcp-ack\"\nrule \"unifi-08c-tcp-window\"\nrule \"unifi-08d-tcp-urgent-pointer\"\nrule \"unifi-09-tcp-flags\"\nrule \"unifi-10-udp-length\"\nrule \"unifi-12-cef-action\"\nrule \"unifi-12-cef-destination\"\nrule \"unifi-12-cef-destination-port\"\nrule \"unifi-12-cef-source-mac\"\nrule \"unifi-12-cef-source-port\"\nrule \"unifi-12-cef-standard-source\"\nrule \"unifi-12-cef-unifi-source\"\nrule \"unifi-13-cef-firewall-policy\"\nrule \"unifi-13-cef-ips-signature\"\nrule \"unifi-13-cef-ips-signature-id\"\nrule \"unifi-13-cef-policy-name\"\nrule \"unifi-14-cef-device-and-security\"\nrule \"unifi-14-cef-device-model\"\nrule \"unifi-14-cef-flow-count\"\nrule \"unifi-14-cef-direction\"\nrule \"unifi-14-cef-policy-type\"\nrule \"unifi-14-cef-risk\"\nrule \"unifi-14-cef-total-bytes\"\nrule \"unifi-14-cef-total-packets\"\nrule \"unifi-15-extract-mac-addresses\"\nend"
+        },
+        "connected_streams": [
+          {
+            "@type": "string",
+            "@value": "2ce2c027-fc3c-412d-b629-00fa6c0427b0"
+          }
+        ]
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "4eeba648-42e1-4cfe-beeb-d1c92be3f133",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-11-dnat-classification"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-11-dnat-classification\"\nwhen\n    has_field(\"unifi_chain\") &&\n    starts_with(to_string($message.unifi_chain), \"PREROUTING-DNAT-\")\nthen\n    set_field(\"unifi_event_type\", \"dnat\");\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "f3984af3-1f96-4ba9-8ce3-d5ca8966893e",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-device-model"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-device-model\"\nwhen has_field(\"cef_UNIFIsrcClientModel\")\nthen\n    set_field(\"src_model\", to_string($message.cef_UNIFIsrcClientModel));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "7b0751a6-9b5f-457f-a8f1-cc8bb54a3a83",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-08c-tcp-window"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-08c-tcp-window\"\nwhen has_field(\"unifi_raw_WINDOW\")\nthen\n    set_field(\"tcp_window\", to_long(to_string($message.unifi_raw_WINDOW)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "b18f1d40-b9cf-4e30-a616-76948ccee75d",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-15-extract-mac-addresses"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-15-extract-mac-addresses\"\nwhen\n    has_field(\"unifi_raw_MAC\")\nthen\n    let mac = to_string($message.unifi_raw_MAC);\n\n    let parsed = regex(\n        \"^([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}):([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5}):([0-9a-fA-F]{2}:[0-9a-fA-F]{2})$\",\n        mac,\n        [\"src_mac\", \"dst_mac\", \"ether_type\"]\n    );\n\n    set_field(\"src_mac\", parsed[\"src_mac\"]);\n    set_field(\"dst_mac\", parsed[\"dst_mac\"]);\n    set_field(\"ether_type\", parsed[\"ether_type\"]);\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "50e48413-6d10-4f57-ad0b-1a544c2f205f",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-unifi-source"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-unifi-source\"\nwhen has_field(\"cef_UNIFIsrcClientIp\")\nthen\n    set_field(\"src_ip\", to_ip(to_string($message.cef_UNIFIsrcClientIp)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "705cd783-1a1a-4b90-9e8c-7f43cc7cf2d3",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-destination-port"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-destination-port\"\nwhen has_field(\"cef_dpt\")\nthen\n    set_field(\"dst_port\", to_long(to_string($message.cef_dpt)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "1ffd4fd8-b921-46c7-84f6-a56f0e5bc654",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-04-dhcp"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-04-dhcp\"\nwhen\n    has_field(\"process_message\") &&\n    contains(to_string($message.process_message), \"DHCP\") &&\n    has_field(\"process_name\") &&\n    to_string($message.process_name) == \"dnsmasq-dhcp\"\nthen\n    let dhcp = multi_grok(\n        patterns: [\n            \"^%{WORD:dhcp_event}\\\\(%{NOTSPACE:dhcp_interface}\\\\) %{NOTSPACE:client_ip} %{NOTSPACE:client_mac}(?: %{GREEDYDATA:client_hostname})?$\",\n            \"^%{WORD:dhcp_event}\\\\(%{NOTSPACE:dhcp_interface}\\\\) %{NOTSPACE:client_mac}$\"\n        ],\n        value: to_string($message.process_message),\n        only_named_captures: true\n    );\n\n    set_fields(dhcp);\n\n    set_field(\"unifi_log_type\", \"dhcp\");\n\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "190c5672-4712-4ba2-a70e-93679509c8cd",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-action"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-action\"\nwhen has_field(\"cef_act\")\nthen\n    set_field(\"action\", to_string($message.cef_act));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "16242e3a-09db-4301-b196-a2cccee9656b",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-policy-type"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-policy-type\"\nwhen has_field(\"cef_UNIFIpolicyType\")\nthen\n    set_field(\"policy_type\", to_string($message.cef_UNIFIpolicyType));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "3401accb-1e5d-4666-90b3-7da4724ee9e3",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-direction"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-direction\"\nwhen has_field(\"cef_UNIFIdirection\")\nthen\n    set_field(\"direction\", to_string($message.cef_UNIFIdirection));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "66ead1db-e184-405c-8f1e-f98a77fe9aea",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-total-bytes"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-total-bytes\"\nwhen has_field(\"cef_UNIFItotalBytes\")\nthen\n    set_field(\"total_bytes\", to_long(to_string($message.cef_UNIFItotalBytes)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "78ec9049-9dfc-4946-9a92-295298db47e8",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-13-cef-policy-name"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-13-cef-policy-name\"\nwhen has_field(\"cef_UNIFIpolicyName\")\nthen\n    set_field(\"policy_name\", to_string($message.cef_UNIFIpolicyName));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "92890258-69af-4100-971b-1bbbc2127cd2",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-08d-tcp-urgent-pointer"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-08d-tcp-urgent-pointer\"\nwhen has_field(\"unifi_raw_URGP\")\nthen\n    set_field(\"tcp_urgent_pointer\", to_long(to_string($message.unifi_raw_URGP)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "1e5b69d9-447f-4c78-b1b7-f94dc14aecb8",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-01-firewall"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-01-firewall\"\nwhen\n    has_field(\"message\") &&\n    contains(to_string($message.message), \" DESCR=\\\"\") &&\n    contains(to_string($message.message), \" MAC=\") &&\n    contains(to_string($message.message), \" SRC=\") &&\n    contains(to_string($message.message), \" PROTO=\")\nthen\n    let msg = to_string($message.message);\n\n    // Extract firewall chain and remaining payload.\n    let base = grok(\n        pattern: \".*\\\\[%{DATA:unifi_chain}\\\\] %{GREEDYDATA:unifi_payload}$\",\n        value: msg,\n        only_named_captures: true\n    );\n\n    set_fields(base);\n\n    // Extract quoted firewall description.\n    let desc = grok(\n        pattern: \"DESCR=\\\"%{DATA:unifi_description}\\\"\",\n        value: msg,\n        only_named_captures: true\n    );\n\n    set_fields(desc);\n\n    // Remove description before parsing key/value pairs.\n    let clean_payload = regex_replace(\n        \"DESCR=\\\"[^\\\"]*\\\"\\\\s*\",\n        to_string(base.unifi_payload),\n        \"\"\n    );\n\n    // Preserve the first LEN if a second LEN exists.\n    let kv = key_value(\n        value: clean_payload,\n        kv_delimiters: \"=\",\n        ignore_empty_values: true,\n        allow_dup_keys: true,\n        handle_dup_keys: \"take_first\"\n    );\n\n    // Preserve original extracted values for troubleshooting.\n    set_fields(kv, \"unifi_raw_\");\n\n    set_field(\"unifi_log_type\", \"firewall\");\n    set_field(\"unifi_event_type\", \"firewall\");\n\n    set_field(\"src_interface\", to_string(kv[\"IN\"]));\n    set_field(\"src_ip\", to_ip(to_string(kv[\"SRC\"])));\n    set_field(\"dst_ip\", to_ip(to_string(kv[\"DST\"])));\n    set_field(\"protocol\", to_string(kv[\"PROTO\"]));\n\n    set_field(\"src_port\", to_long(to_string(kv[\"SPT\"])));\n    set_field(\"dst_port\", to_long(to_string(kv[\"DPT\"])));\n\n    set_field(\"packet_length\", to_long(to_string(kv[\"LEN\"])));\n    set_field(\"ttl\", to_long(to_string(kv[\"TTL\"])));\n    set_field(\"ip_packet_id\", to_long(to_string(kv[\"ID\"])));\n\n    set_field(\"ip_tos\", to_string(kv[\"TOS\"]));\n    set_field(\"ip_precedence\", to_string(kv[\"PREC\"]));\n    set_field(\"firewall_mark\", to_string(kv[\"MARK\"]));\n\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "2848d37a-7131-4e0c-9dd3-f0e6b9a8a2ab",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-10-udp-length"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-10-udp-length\"\nwhen\n    has_field(\"unifi_chain\") &&\n    contains(to_string($message.message), \"PROTO=UDP\") &&\n    contains(to_string($message.message), \"LEN=\")\nthen\n    let udp = grok(\n        pattern: \".*PROTO=UDP.*LEN=%{INT:udp_payload_length}.*\",\n        value: to_string($message.message),\n        only_named_captures: true\n    );\n\n    set_field(\n        \"udp_payload_length\",\n        to_long(to_string(udp.udp_payload_length))\n    );\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "ecc1362b-08b0-412e-9a46-bf6bb8b749f7",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-device-and-security"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-device-and-security\"\nwhen has_field(\"cef_UNIFIsrcClientHostname\")\nthen\n    set_field(\"src_hostname\", to_string($message.cef_UNIFIsrcClientHostname));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "adb2c192-73fe-4505-8337-98b2d2fc7988",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-03-cef"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-03-cef\"\nwhen\n    has_field(\"message\") &&\n    contains(to_string($message.message), \"CEF:0|Ubiquiti|UniFi Network|\")\nthen\n    let msg = to_string($message.message);\n\n    // Remove syslog envelope, retaining CEF.\n    let cef_text = regex_replace(\n        \"^.*?(CEF:[0-9]+\\\\|.*)$\",\n        msg,\n        \"$1\"\n    );\n\n    // Parse CEF using short extension field names.\n    let cef_fields = parse_cef(cef_text, false);\n\n    // Keep CEF fields separate from normalized fields.\n    set_fields(cef_fields, \"cef_\");\n\n    set_field(\"unifi_log_type\", \"cef_security\");\n\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "7a0b0d81-1cc4-4c4f-979d-b756c3cf1bed",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-standard-source"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-standard-source\"\nwhen has_field(\"cef_src\")\nthen\n    set_field(\"src_ip\", to_ip(to_string($message.cef_src)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "cce8bc16-58b8-4c1b-bf20-4f2b1cfdf3e6",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-source-mac"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-source-mac\"\nwhen has_field(\"cef_UNIFIsrcClientMac\")\nthen\n    set_field(\"src_mac\", to_string($message.cef_UNIFIsrcClientMac));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "22646f60-70fe-46cc-a69f-808598d83c23",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-05-dhcp-ip"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-05-dhcp-ip\"\nwhen\n    has_field(\"dhcp_event\") &&\n    has_field(\"client_ip\")\nthen\n    set_field(\n        \"client_ip\",\n        to_ip(to_string($message.client_ip))\n    );\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "b28c89f3-cdca-47f9-9849-743f39e0d34b",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-08b-tcp-ack"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-08b-tcp-ack\"\nwhen has_field(\"unifi_raw_ACK\")\nthen\n    set_field(\"tcp_ack\", to_long(to_string($message.unifi_raw_ACK)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "f0984e1c-981b-4d88-83ef-890b8876e643",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-13-cef-ips-signature-id"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-13-cef-ips-signature-id\"\nwhen has_field(\"cef_UNIFIipsSignatureId\")\nthen\n    set_field(\"ips_signature_id\", to_long(to_string($message.cef_UNIFIipsSignatureId)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "4400ed67-ed9e-4e09-b4b9-1b15682e5ffe",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-07-destination-interface"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-07-destination-interface\"\nwhen\n    has_field(\"unifi_raw_OUT\")\nthen\n    set_field(\n        \"dst_interface\",\n        to_string($message.unifi_raw_OUT)\n    );\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "c3beca38-50de-49e8-b60a-03cc0b273463",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-09-tcp-flags"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-09-tcp-flags\"\nwhen\n    has_field(\"unifi_chain\") &&\n    contains(to_string($message.message), \" SYN \")\nthen\n    set_field(\"tcp_flags\", \"SYN\");\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "a0aeb12e-c9e1-4117-967d-db78f25426de",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-destination"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-destination\"\nwhen has_field(\"cef_dst\")\nthen\n    set_field(\"dst_ip\", to_ip(to_string($message.cef_dst)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "e0bce6ba-b587-4eb3-882a-a19e02bea176",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-13-cef-firewall-policy"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-13-cef-firewall-policy\"\nwhen has_field(\"cef_UNIFIfirewallPolicy\")\nthen\n    set_field(\"policy_name\", to_string($message.cef_UNIFIfirewallPolicy));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "f4026267-2a0e-4768-8cde-c9779f1644da",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-total-packets"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-total-packets\"\nwhen has_field(\"cef_UNIFItotalPackets\")\nthen\n    set_field(\"total_packets\", to_long(to_string($message.cef_UNIFItotalPackets)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "935d3c6a-7de5-4024-a491-f8630af78c79",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-02-process"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-02-process\"\nwhen\n    has_field(\"message\") &&\n    contains(to_string($message.message), \"]: \") &&\n    (\n        contains(to_string($message.message), \"dnsmasq-dhcp[\") ||\n        contains(to_string($message.message), \"unifi-mq-broker[\")\n    )\nthen\n    let msg = to_string($message.message);\n\n    let parsed = grok(\n        pattern: \".*%{NOTSPACE:process_name}\\\\[%{INT:process_id}\\\\]: %{GREEDYDATA:process_message}$\",\n        value: msg,\n        only_named_captures: true\n    );\n\n    set_fields(parsed);\n\n    set_field(\n        \"process_id\",\n        to_long(to_string(parsed.process_id))\n    );\n\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "1c57d84f-07d9-43b1-b7f2-078b0455f748",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-11-custom-classification"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-11-custom-classification\"\nwhen\n    has_field(\"unifi_chain\") &&\n    starts_with(to_string($message.unifi_chain), \"CUSTOM\") &&\n    !contains(to_string($message.unifi_chain), \"_WAN-\")\nthen\n    set_field(\"unifi_event_type\", \"custom_firewall\");\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "68a68e6d-cd31-4e55-906d-b353fbe58c74",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-flow-count"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-flow-count\"\nwhen has_field(\"cef_UNIFIflowCount\")\nthen\n    set_field(\"flow_count\", to_long(to_string($message.cef_UNIFIflowCount)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "d6caa2bd-c030-4c99-b143-1f6be52bd4fc",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-14-cef-risk"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-14-cef-risk\"\nwhen has_field(\"cef_UNIFIrisk\")\nthen\n    set_field(\"risk\", to_string($message.cef_UNIFIrisk));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "261e98c8-fc5b-421a-8bcb-607160e4562e",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-13-cef-ips-signature"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-13-cef-ips-signature\"\nwhen has_field(\"cef_UNIFIipsSignature\")\nthen\n    set_field(\"ips_signature\", to_string($message.cef_UNIFIipsSignature));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "6955718c-fe19-4271-8508-97e7b01cfeea",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-06-diagnostics"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "\nrule \"unifi-06-diagnostics\"\nwhen\n    has_field(\"process_message\") &&\n    contains(to_string($message.process_message), \"MEM usage\")\nthen\n    let stats = key_value(\n        value: to_string($message.process_message),\n        kv_delimiters: \"=\",\n        ignore_empty_values: true\n    );\n\n    set_field(\"unifi_log_type\", \"system_diagnostic\");\n\n    set_field(\"memory_flows\", to_long(to_string(stats[\"flows\"])));\n    set_field(\"memory_dying\", to_long(to_string(stats[\"dying\"])));\n    set_field(\"memory_dns\", to_long(to_string(stats[\"dns\"])));\n    set_field(\"memory_ifaces\", to_long(to_string(stats[\"ifaces\"])));\n    set_field(\"memory_dns_resolv\", to_long(to_string(stats[\"dnsResolv\"])));\n    set_field(\"memory_routines\", to_long(to_string(stats[\"routines\"])));\n\nend\n"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "77863a3b-b54f-4ba4-b8cc-e33a0f508486",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-12-cef-source-port"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-12-cef-source-port\"\nwhen has_field(\"cef_spt\")\nthen\n    set_field(\"src_port\", to_long(to_string($message.cef_spt)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "dd82f355-ec7c-4844-9295-a05d7c924f67",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "unifi-08a-tcp-sequence"
+        },
+        "description": null,
+        "source": {
+          "@type": "string",
+          "@value": "rule \"unifi-08a-tcp-sequence\"\nwhen has_field(\"unifi_raw_SEQ\")\nthen\n    set_field(\"tcp_sequence\", to_long(to_string($message.unifi_raw_SEQ)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "stream_title",
+        "version": "1"
+      },
+      "id": "2ce2c027-fc3c-412d-b629-00fa6c0427b0",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "UCG-Max"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=7.2.2+94adc86"
+        }
+      ]
+    }
+  ]
+}
